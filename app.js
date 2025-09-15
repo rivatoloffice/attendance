@@ -1,34 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-     // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCCKUrPWze7zhdyM6Ramo0C4ELz0vwgz1M",
-  authDomain: "attendance-app-sync.firebaseapp.com",
-  databaseURL: "https://attendance-app-sync-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "attendance-app-sync",
-  storageBucket: "attendance-app-sync.firebasestorage.app",
-  messagingSenderId: "138851888790",
-  appId: "1:138851888790:web:cd477e0c8f54588f4e9cb7",
-  measurementId: "G-CPRHK06GTL"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-    
     // --- STATE MANAGEMENT (No changes here) ---
     const STUDENT_COLORS = {
         '--vibrant-gold': '#FFC75F', '--bright-teal': '#4BBEB5', '--royal-blue': '#4D9DE0',
@@ -110,5 +80,6 @@ const analytics = getAnalytics(app);
     function renderCalendar() { const year = currentDate.getFullYear(); const month = currentDate.getMonth(); monthYearLabel.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`; calendarDatesGrid.innerHTML = ''; const firstDayOfMonth = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate(); for (let i = 0; i < firstDayOfMonth; i++) calendarDatesGrid.appendChild(document.createElement('div')); for (let day = 1; day <= daysInMonth; day++) { const dateSquare = document.createElement('div'); dateSquare.className = 'date-square'; dateSquare.textContent = day; const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; dateSquare.dataset.date = dateStr; const studentData = students[currentStudentIndex]?.attendance; if (studentData && studentData[dateStr]) { const totalHours = studentData[dateStr].reduce((sum, entry) => sum + parseFloat(entry.hours || 0), 0); if (totalHours > 0) { const badge = document.createElement('span'); badge.className = 'total-hours-badge'; badge.textContent = totalHours; dateSquare.appendChild(badge); } } dateSquare.addEventListener('click', () => openAttendanceModal(dateStr)); calendarDatesGrid.appendChild(dateSquare); } }
     function openAttendanceModal(dateStr) { clickedDateStr = dateStr; modalDateLabel.textContent = new Date(dateStr + 'T12:00:00Z').toLocaleDateString(); dailyEntriesList.innerHTML = ''; const entries = students[currentStudentIndex]?.attendance?.[dateStr]; if (entries && entries.length > 0) { entries.forEach((entry, index) => { const entryContainer = document.createElement('div'); const entryEl = document.createElement('span'); entryEl.innerHTML = `<strong>${entry.hours} hours</strong> (${entry.timeRange || 'No time given'})`; const deleteBtn = document.createElement('button'); deleteBtn.className = 'delete-entry-btn'; deleteBtn.textContent = 'X'; deleteBtn.dataset.index = index; deleteBtn.addEventListener('click', () => deleteEntry(dateStr, index)); entryContainer.appendChild(entryEl); entryContainer.appendChild(deleteBtn); dailyEntriesList.appendChild(entryContainer); }); showListViewBtn.click(); } else { dailyEntriesList.innerHTML = '<p>No entries for this date.</p>'; showAddViewBtn.click(); } hoursInput.value = ''; timeRangeInput.value = ''; attendanceModal.style.display = 'flex'; }
     function deleteEntry(dateStr, entryIndex) { const entries = students[currentStudentIndex].attendance[dateStr]; entries.splice(entryIndex, 1); if (entries.length === 0) { delete students[current
+
 
 
