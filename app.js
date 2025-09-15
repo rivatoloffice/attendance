@@ -53,17 +53,65 @@ selectedStudentHeader.addEventListener('click', () => {
     function renderCalendar() { const year = currentDate.getFullYear(); const month = currentDate.getMonth(); monthYearLabel.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`; calendarDatesGrid.innerHTML = ''; const firstDayOfMonth = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate(); for (let i = 0; i < firstDayOfMonth; i++) calendarDatesGrid.appendChild(document.createElement('div')); for (let day = 1; day <= daysInMonth; day++) { const dateSquare = document.createElement('div'); dateSquare.className = 'date-square'; dateSquare.textContent = day; const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; dateSquare.dataset.date = dateStr; const studentData = students[currentStudentIndex].attendance; if (studentData && studentData[dateStr]) { const totalHours = studentData[dateStr].reduce((sum, entry) => sum + parseFloat(entry.hours || 0), 0); if (totalHours > 0) { const badge = document.createElement('span'); badge.className = 'total-hours-badge'; badge.textContent = totalHours; dateSquare.appendChild(badge); } } dateSquare.addEventListener('click', () => openAttendanceModal(dateStr)); calendarDatesGrid.appendChild(dateSquare); } }
     function openAttendanceModal(dateStr) { clickedDateStr = dateStr; modalDateLabel.textContent = new Date(dateStr + 'T12:00:00Z').toLocaleDateString(); dailyEntriesList.innerHTML = ''; const entries = students[currentStudentIndex].attendance[dateStr]; if (entries && entries.length > 0) { entries.forEach((entry, index) => { const entryContainer = document.createElement('div'); const entryEl = document.createElement('span'); entryEl.innerHTML = `<strong>${entry.hours} hours</strong> (${entry.timeRange || 'No time given'})`; const deleteBtn = document.createElement('button'); deleteBtn.className = 'delete-entry-btn'; deleteBtn.textContent = 'X'; deleteBtn.dataset.index = index; deleteBtn.addEventListener('click', () => deleteEntry(dateStr, index)); entryContainer.appendChild(entryEl); entryContainer.appendChild(deleteBtn); dailyEntriesList.appendChild(entryContainer); }); showListViewBtn.click(); } else { dailyEntriesList.innerHTML = '<p>No entries for this date.</p>'; showAddViewBtn.click(); } hoursInput.value = ''; timeRangeInput.value = ''; attendanceModal.style.display = 'flex'; }
     function deleteEntry(dateStr, entryIndex) { const entries = students[currentStudentIndex].attendance[dateStr]; entries.splice(entryIndex, 1); if (entries.length === 0) { delete students[currentStudentIndex].attendance[dateStr]; } saveData(); renderCalendar(); populateMonths(); openAttendanceModal(dateStr); }
-    function closeAttendanceModal() { attendanceModal.style.display = 'none'; }
-    showAddViewBtn.addEventListener('click', () => { addEntryView.classList.remove('hidden'); viewEntriesView.classList.add('hidden'); showAddViewBtn.classList.add('active'); showListViewBtn.classList.remove('active'); saveAttendanceBtn.style.display = 'inline-block'; });
-    showListViewBtn.addEventListener('click', () => { addEntryView.classList.add('hidden'); viewEntriesView.classList.remove('hidden'); showAddViewBtn.classList.remove('active'); showListViewBtn.classList.add('active'); saveAttendanceBtn.style.display = 'none'; });
-    cancelAttendanceBtn.addEventListener('click', closeAttendanceModal);
-    // FIX: Add this new event listener
-attendanceModal.addEventListener('click', (event) => {
-    // This checks if the click was on the dark background itself
-    if (event.target === attendanceModal) {
-        closeAttendanceModal();
+   function closeAttendanceModal() {
+        attendanceModal.style.display = 'none';
     }
-});
-    saveAttendanceBtn.addEventListener('click', () => { const hours = hoursInput.value; const timeRange = timeRangeInput.value; if (!hours || isNaN(hours)) { alert("Please enter a valid number for hours."); return; } const studentData = students[currentStudentIndex].attendance; if (!studentData[clickedDateStr]) { studentData[clickedDateStr] = []; } studentData[clickedDateStr].push({ hours: parseFloat(hours), timeRange }); saveData(); closeAttendanceModal(); renderCalendar(); populateMonths();});
-    loadData(); renderStudentTabs(); studentWheelContainer.addEventListener('scroll', updateWheelAnimation);
+
+    showAddViewBtn.addEventListener('click', () => {
+        addEntryView.classList.remove('hidden');
+        viewEntriesView.classList.add('hidden');
+        showAddViewBtn.classList.add('active');
+        showListViewBtn.classList.remove('active');
+        saveAttendanceBtn.style.display = 'inline-block';
+    });
+
+    showListViewBtn.addEventListener('click', () => {
+        addEntryView.classList.add('hidden');
+        viewEntriesView.classList.remove('hidden');
+        showAddViewBtn.classList.remove('active');
+        showListViewBtn.classList.add('active');
+        saveAttendanceBtn.style.display = 'none';
+    });
+
+    cancelAttendanceBtn.addEventListener('click', closeAttendanceModal);
+
+    attendanceModal.addEventListener('click', (event) => {
+        if (event.target === attendanceModal) {
+            closeAttendanceModal();
+        }
+    });
+
+    saveAttendanceBtn.addEventListener('click', () => {
+        const hours = hoursInput.value;
+        const timeRange = timeRangeInput.value;
+        if (!hours || isNaN(hours)) {
+            alert("Please enter a valid number for hours.");
+            return;
+        }
+        const studentData = students[currentStudentIndex].attendance;
+        if (!studentData[clickedDateStr]) {
+            studentData[clickedDateStr] = [];
+        }
+        studentData[clickedDateStr].push({ hours: parseFloat(hours), timeRange });
+        saveData();
+        closeAttendanceModal();
+        renderCalendar();
+        populateMonths();
+    });
+
+    // ## NEW: Save with "Enter" Key ##
+    function handleEnterKey(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            saveAttendanceBtn.click();
+        }
+    }
+    hoursInput.addEventListener('keydown', handleEnterKey);
+    timeRangeInput.addEventListener('keydown', handleEnterKey);
+
+
+    // --- INITIALIZATION ---
+    loadData();
+    renderStudentTabs();
+    studentWheelContainer.addEventListener('scroll', updateWheelAnimation);
 });
