@@ -1,5 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCEvz2o1Axp4c-YZjnE383n0BsUNajSh5A",
+    authDomain: "attendance-rivatol.firebaseapp.com",
+    databaseURL: "https://attendance-rivatol-default-rtdb.firebaseio.com",
+    projectId: "attendance-rivatol",
+    storageBucket: "attendance-rivatol.firebasestorage.app",
+    messagingSenderId: "975043014376",
+    appId: "1:975043014376:web:4c5a7091c38e4b4d9c235d"
+  };
+    
     // =========================================================================
     // CONSTANTS & STATE VARIABLES
     // =========================================================================
@@ -493,3 +504,4 @@ function getOrdinalSuffix(day) {
     renderStudentTabs();
 
 });
+
