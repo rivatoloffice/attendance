@@ -4,14 +4,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // CONSTANTS & STATE VARIABLES
     // =========================================================================
     
-    const STUDENT_COLORS = {
-        '--vibrant-gold': '#FFC75F',
-        '--bright-teal': '#4BBEB5',
-        '--royal-blue': '#4D9DE0',
-        '--coral-orange': '#F99157',
-        '--bright-sky': '#80C4E9'
-    };
-    const COLOR_NAMES = Object.keys(STUDENT_COLORS);
+    // In app.js
+
+    // FIX: New "Deep Jewel Tones" Palette
+// FIX: New "Dark Red" Brand Palette
+const STUDENT_COLORS = {
+    '--dark-raisin': '#360f02',
+      '--gold': '#F6AA1C',
+    '--burgundy': '#621708',
+    '    --gold':'#ee8c29',
+  
+    '--burnt-orange': '#BC3908'
+    
+};
+const COLOR_NAMES = Object.keys(STUDENT_COLORS);
 
     let students = [];
     let currentStudentIndex = null;
@@ -61,6 +67,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     // HELPER & UTILITY FUNCTIONS
     // =========================================================================
+
+
+    /**
+ * Returns the ordinal suffix for a day number.
+ * @param {number} day - The day of the month.
+ * @returns {string} - The suffix ('st', 'nd', 'rd', or 'th').
+ */
+function getOrdinalSuffix(day) {
+    if (day > 3 && day < 21) return 'th'; // for 11th, 12th, 13th
+    switch (day % 10) {
+        case 1:  return "st";
+        case 2:  return "nd";
+        case 3:  return "rd";
+        default: return "th";
+    }
+}
 
     /**
      * Checks if a hex color is dark, to decide on light/dark text.
@@ -125,18 +147,23 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function renderStudentTabs() {
         studentWheel.innerHTML = '';
+        if (!students) return;
         students.forEach((student, index) => {
+            if (!student) return;
             const tab = document.createElement('div');
             tab.className = 'student-tab';
             tab.textContent = student.name;
             const colorName = COLOR_NAMES[index % COLOR_NAMES.length];
             const colorHex = STUDENT_COLORS[colorName];
             tab.style.backgroundColor = `var(${colorName})`;
+
+            // FIX: Sets text color directly to bypass CSS file issues.
             if (isColorDark(colorHex)) {
-                tab.style.color = 'var(--text-light)';
+                tab.style.color = '#f0f0f0'; // Directly sets light text
             } else {
-                tab.style.color = 'var(--text-dark)';
+                tab.style.color = '#2c2c2c'; // Directly sets dark text
             }
+
             tab.dataset.index = index;
             tab.addEventListener('click', handleStudentTabClick);
             studentWheel.appendChild(tab);
@@ -270,38 +297,50 @@ document.addEventListener('DOMContentLoaded', () => {
      * Opens the attendance modal for a specific date.
      * @param {string} dateStr - The date string in 'YYYY-MM-DD' format.
      */
+
     function openAttendanceModal(dateStr) {
-        clickedDateStr = dateStr;
-        modalDateLabel.textContent = new Date(dateStr + 'T12:00:00Z').toLocaleDateString();
-        dailyEntriesList.innerHTML = '';
-        const entries = students[currentStudentIndex].attendance[dateStr];
+    clickedDateStr = dateStr;
 
-        if (entries && entries.length > 0) {
-            entries.forEach((entry, index) => {
-                const entryContainer = document.createElement('div');
-                const entryEl = document.createElement('span');
-                entryEl.innerHTML = `<strong>${entry.hours} hours</strong> (${entry.timeRange || 'No time given'})`;
-                
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-entry-btn';
-                deleteBtn.textContent = 'X';
-                deleteBtn.dataset.index = index;
-                deleteBtn.addEventListener('click', () => deleteEntry(dateStr, index));
-                
-                entryContainer.appendChild(entryEl);
-                entryContainer.appendChild(deleteBtn);
-                dailyEntriesList.appendChild(entryContainer);
-            });
-            showListViewBtn.click();
-        } else {
-            dailyEntriesList.innerHTML = '<p>No entries for this date.</p>';
-            showAddViewBtn.click();
-        }
+    // --- NEW DATE FORMATTING LOGIC ---
+    const date = new Date(dateStr + 'T12:00:00Z');
+    const day = date.getDate();
+    const month = date.toLocaleString('default', { month: 'long' });
+    const year = date.getFullYear();
+    const suffix = getOrdinalSuffix(day);
 
-        hoursInput.value = '';
-        timeRangeInput.value = '';
-        attendanceModal.style.display = 'flex';
+    // Use innerHTML to allow for the <sup> superscript tag
+    modalDateLabel.innerHTML = `${day}<sup>${suffix}</sup> ${month} ${year}`;
+    // --- END OF NEW LOGIC ---
+
+    dailyEntriesList.innerHTML = '';
+    const entries = students[currentStudentIndex].attendance[dateStr];
+
+    if (entries && entries.length > 0) {
+        entries.forEach((entry, index) => {
+            const entryContainer = document.createElement('div');
+            const entryEl = document.createElement('span');
+            entryEl.innerHTML = `<strong>${entry.hours} hours</strong> (${entry.timeRange || 'No time given'})`;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-entry-btn';
+            deleteBtn.textContent = 'X';
+            deleteBtn.dataset.index = index;
+            deleteBtn.addEventListener('click', () => deleteEntry(dateStr, index));
+
+            entryContainer.appendChild(entryEl);
+            entryContainer.appendChild(deleteBtn);
+            dailyEntriesList.appendChild(entryContainer);
+        });
+        showListViewBtn.click();
+    } else {
+        dailyEntriesList.innerHTML = '<p>No entries for this date.</p>';
+        showAddViewBtn.click();
     }
+
+    hoursInput.value = '';
+    timeRangeInput.value = '';
+    attendanceModal.style.display = 'flex';
+}
 
     /**
      * Deletes a specific attendance entry for a student on a given date.
