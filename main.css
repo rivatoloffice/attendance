@@ -1,12 +1,16 @@
 /* ========================================================================= */
 /* ROOT VARIABLES / THEME COLORS
 /* ========================================================================= */
+
 :root {
-    --vibrant-gold: #FFC75F;
-    --bright-teal: #4BBEB5;
-    --royal-blue: #4D9DE0;
-    --coral-orange: #F99157;
-    --bright-sky: #80C4E9;
+    /* FIX: New "Dark Red" Brand Palette */
+    --dark-raisin: #360f02;
+    --gold: #F6AA1C;
+    --burgundy: #621708;
+    --gold: #ee8c29;
+
+    --burnt-orange: #BC3908;
+    
     --pastel-red: #FFD1D1;
     --deep-brown: #5c4033;
     --text-dark: #2c2c2c;
@@ -93,7 +97,7 @@ body {
     padding: 15px 30px;
     border-radius: 50px;
     border: none;
-    background-color: #fff;
+    background-color: #f4e5cb;
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
@@ -105,17 +109,24 @@ body {
 /* ========================================================================= */
 #details-page {
     justify-content: flex-start;
-    padding-top: 50px;
-    gap: 0;
+    padding-top: 20px; /* FIX: Reduced top padding */
+    gap: 20px; /* FIX: Added a smaller gap */
 }
-
 .detail-header {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    margin-bottom: 40px;
+    margin-bottom: 0; /* FIX: Removed margin, will use parent's gap instead */
 }
+
+
+/* FIX: Ensures the animated student tab is always centered */
+#selected-student-header {
+    display: flex;
+    justify-content: center;
+}
+
 
 #delete-student-btn {
     background: none;
@@ -153,7 +164,7 @@ body {
     padding: 20px;
     border-radius: 20px;
     border: none;
-    background: rgba(255,255,255,0.7);
+    background: rgba(221, 210, 180, 0.7);
     font-size: 1.1rem;
     cursor: pointer;
     transition: background-color 0.2s;
@@ -161,7 +172,7 @@ body {
 }
 
 .month-btn:hover {
-    background: #fff;
+    background: #d69b49;
 }
 
 .month-total-hours {
@@ -209,8 +220,8 @@ body {
     display: none;
     flex-direction: column;
     align-items: center;
-    background: rgba(255,255,255,0.8);
-    padding: 30px;
+    background: rgba(239, 227, 197, 0.8);
+    padding: 20px; /* FIX: Reduced padding */
     border-radius: 30px;
     box-shadow: 0 10px 30px var(--shadow-color);
 }
@@ -219,7 +230,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 350px;
+    width: 450px;
     margin-bottom: 20px;
 }
 
@@ -236,19 +247,19 @@ body {
 
 .calendar-grid {
     display: grid;
-    grid-template-columns: repeat(7, 50px);
-    gap: 5px;
+    /* FIX: Made columns smaller */
+    grid-template-columns: repeat(7, 77px); 
+    gap: 4px; /* FIX: Reduced gap */
 }
-
 .calendar-grid div {
-    width: 50px;
-    height: 50px;
+    /* FIX: Made date squares smaller */
+    width: 77px;
+    height: 44px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
 }
-
 .day-name {
     font-weight: bold;
 }
@@ -284,7 +295,7 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 209, 209, 0.5);
+    background-color: rgba(118, 8, 8, 0.5);
     justify-content: center;
     align-items: center;
 }
@@ -344,13 +355,13 @@ body {
     align-items: center;
     margin: 5px 0;
     padding: 5px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(95, 6, 6, 0.05);
 }
 
 .modal-content input {
     padding: 10px;
     border-radius: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #e1d9d9;
     font-size: 1rem;
 }
 
@@ -369,8 +380,16 @@ body {
 }
 
 #save-attendance-btn {
-    background-color: var(--muted-green);
-    color: #fff;
+    background-color: var(--bright-maroon); /* FIX: New light background color */
+    color: var(--text-light); /* FIX: Dark text for better contrast */
+    font-weight: bold;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); /* FIX: Subtle shadow added */
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+#save-attendance-btn:hover {
+    background-color: #510808; /* A slightly darker teal for hover */
+    transform: translateY(-1px);
 }
 
 .delete-entry-btn {
@@ -385,4 +404,50 @@ body {
     flex-shrink: 0;
     line-height: 22px;
     text-align: center;
+}
+/* ========================================================================= */
+/* MOBILE RESPONSIVE STYLES
+/* ========================================================================= */
+
+/* This rule applies only to screens 480px wide or smaller (like phones) */
+@media (max-width: 480px) {
+
+    /* Make the calendar header and grid narrower to fit the screen */
+    .calendar-header {
+        width: 300px; /* Further reduced for smaller fonts */
+    }
+    .calendar-grid {
+        grid-template-columns: repeat(7, 40px); /* Smaller columns */
+        gap: 2px;
+    }
+    .calendar-grid div {
+        width: 40px; /* Smaller date squares */
+        height: 40px;
+    }
+
+    /* FIX: Added new lines to reduce font sizes */
+    .month-btn {
+        font-size: 0.9rem;
+    }
+    #month-year-label {
+        font-size: 1.2rem;
+    }
+    .day-name {
+        font-size: 0.7rem;
+    }
+    .date-square {
+        font-size: 0.85rem;
+    }
+    .total-hours-badge {
+        font-size: 0.7rem;
+    }
+    /* End of font size fixes */
+
+    .months-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .modal-content {
+        width: 90%;
+    }
 }
